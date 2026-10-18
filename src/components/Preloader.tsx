@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { gsap, ScrollTrigger } from '@/lib/gsap'
 import { getLenis, markIntroDone, prefersReducedMotion, scrollTo } from '@/lib/runtime'
+import { sound } from '@/lib/sound/engine'
+import { soundHint } from '@/content/music'
+import SoundBars from './SoundBars'
 import styles from './Preloader.module.css'
 
 const LOG = [
@@ -30,13 +33,34 @@ export default function Preloader() {
   const bar = useRef<HTMLSpanElement>(null)
   const log = useRef<HTMLOListElement>(null)
   const [gone, setGone] = useState(false)
+  const [gate, setGate] = useState(false)
+
+  const exit = () => {
+    if (!root.current) return
+    const tl = gsap.timeline({ onComplete: () => setGone(true) })
+    tl.to(root.current.firstElementChild, { yPercent: -12, autoAlpha: 0, duration: 0.7, ease: 'power3.in' }, 0)
+      .to(root.current, { clipPath: 'inset(0% 0% 100% 0%)', duration: 1.25, ease: 'expo.inOut' }, 0.25)
+      .add(finish, 0.75)
+  }
+
+  // The click is the user gesture browsers require before audio can start.
+  const choose = (withSound: boolean) => {
+    if (withSound) sound.play()
+    else sound.pause()
+    exit()
+  }
 
   useEffect(() => {
+    sound.init()
     if (prefersReducedMotion()) {
+      if (sound.preference() === 'on') sound.arm()
       finish()
       setGone(true)
       return
     }
+
+    // Render the soundtrack while the counter runs, so it's ready the moment they choose.
+    if (sound.preference() !== 'off') sound.prepare()
 
     let seen = false
     try {
@@ -69,10 +93,15 @@ export default function Preloader() {
     let killed = false
     Promise.all([counting, loaded, document.fonts?.ready]).then(() => {
       if (killed || !root.current) return
-      const tl = gsap.timeline({ onComplete: () => setGone(true) })
-      tl.to(root.current.firstElementChild, { yPercent: -12, autoAlpha: 0, duration: 0.7, ease: 'power3.in' }, 0)
-        .to(root.current, { clipPath: 'inset(0% 0% 100% 0%)', duration: 1.25, ease: 'expo.inOut' }, 0.25)
-        .add(finish, 0.75)
+      const pref = sound.preference()
+      // First visit: ask, and render the first track while they decide so it starts instantly.
+      // Returning visitors keep their choice ("on" starts at their first click).
+      if (sound.getState().supported && pref === null) {
+        sound.prepare()
+        return setGate(true)
+      }
+      if (pref === 'on') sound.arm()
+      exit()
     })
 
     return () => {
@@ -83,7 +112,13 @@ export default function Preloader() {
   if (gone) return null
 
   return (
-    <div ref={root} className={`${styles.preloader} preloader`} aria-hidden="true">
+    <div
+      ref={root}
+      className={`${styles.preloader} preloader`}
+      aria-hidden={!gate}
+      role={gate ? 'dialog' : undefined}
+      aria-label={gate ? 'Choose whether to play music' : undefined}
+    >
       <div className={styles.inner}>
         <div className={`${styles.top} mono`}>
           <span>Rudray Dave</span>
@@ -106,12 +141,27 @@ export default function Preloader() {
             <span ref={count}>000</span>
             <sup>%</sup>
           </div>
-          <div className={styles.barWrap}>
-            <span className="mono">Loading weights</span>
-            <div className={styles.bar}>
-              <span ref={bar} />
+          {gate ? (
+            <div className={styles.gate} data-sound-control>
+              <p className={`${styles.gateHint} mono`}>{soundHint}</p>
+              <div className={styles.gateButtons}>
+                <button className={styles.enterSound} onClick={() => choose(true)} autoFocus>
+                  <SoundBars demo />
+                  Enter with sound
+                </button>
+                <button className={styles.enterSilent} onClick={() => choose(false)}>
+                  Enter in silence
+                </button>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className={styles.barWrap}>
+              <span className="mono">Loading weights</span>
+              <div className={styles.bar}>
+                <span ref={bar} />
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

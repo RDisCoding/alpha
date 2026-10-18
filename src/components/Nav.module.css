@@ -81,6 +81,45 @@
   }
 }
 
+.sound {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(16px, 2vw, 28px);
+}
+
+.soundToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+}
+
+.soundLabel {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .soundLabel {
+    display: inline;
+  }
+}
+
+.trackBtn {
+  display: none;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+}
+
+.trackBtn:hover {
+  opacity: 1;
+}
+
+@media (min-width: 1100px) {
+  .trackBtn {
+    display: inline-flex;
+  }
+}
+
 .burger {
   display: inline-flex;
   align-items: center;
@@ -222,4 +261,68 @@
 .menuNow p {
   font-size: 17px;
   color: var(--paper-2);
+}
+
+/* ---------- soundtrack (menu) ---------- */
+
+.menuSound ul {
+  display: grid;
+  border-top: 1px solid var(--line);
+}
+
+.trackItem {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 28px 1fr auto 18px;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--paper-2);
+  transition: color 0.3s;
+}
+
+.trackItem:hover {
+  color: var(--paper);
+}
+
+.trackItem[aria-pressed='true'] {
+  color: var(--lilac);
+}
+
+.trackTitle {
+  font-size: 17px;
+  letter-spacing: -0.01em;
+}
+
+.trackBars {
+  justify-self: end;
+}
+
+.trackItem[aria-pressed='false'] .trackBars {
+  opacity: 0.3;
+}
+
+.soundRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-top: 6px;
+}
+
+.soundRow :global(.btn) {
+  height: 40px;
+  padding: 0 18px;
+}
+
+.volume {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.volume input {
+  width: 140px;
+  accent-color: var(--violet);
 }

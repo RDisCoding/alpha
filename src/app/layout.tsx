@@ -11,6 +11,7 @@ import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
 import PageTransition from '@/components/PageTransition'
 import Cursor from '@/components/Cursor'
+import SoundBridge from '@/components/SoundBridge'
 
 const sans = Geist({ subsets: ['latin'], variable: '--font-sans', display: 'swap' })
 const mono = Geist_Mono({ subsets: ['latin'], variable: '--font-mono', display: 'swap' })
@@ -62,6 +63,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           Skip to content
         </a>
         <SmoothScroll />
+        <SoundBridge />
         <Preloader />
         <Nav />
         {children}

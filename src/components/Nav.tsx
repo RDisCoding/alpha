@@ -5,8 +5,11 @@ import { usePathname } from 'next/navigation'
 import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap'
 import { getLenis, scrollTo } from '@/lib/runtime'
 import { profile } from '@/content/profile'
+import { playlist } from '@/content/music'
+import { sound, useSound } from '@/lib/sound/engine'
 import TransitionLink from './TransitionLink'
 import LocalTime from './LocalTime'
+import SoundBars from './SoundBars'
 import styles from './Nav.module.css'
 
 export const sections = [
@@ -26,6 +29,9 @@ export default function Nav() {
   const tl = useRef<gsap.core.Timeline | null>(null)
   const holdNav = useRef(0)
   const pathname = usePathname()
+  const snd = useSound()
+  const soundOn = snd.playing || snd.armed
+  const track = playlist[snd.index]
 
   // Hide on scroll down, show on scroll up.
   useGSAP(() => {
@@ -62,6 +68,7 @@ export default function Nav() {
     // Only react to actual toggles, so we never restart Lenis while the preloader holds it.
     if (!t || prevOpen.current === open) return
     prevOpen.current = open
+    sound.muffle(open)
     if (open) {
       getLenis()?.stop()
       t.timeScale(1).play()
@@ -114,6 +121,24 @@ export default function Nav() {
               <span data-text="Résumé ↗">Résumé ↗</span>
             </span>
           </a>
+          {snd.supported && (
+            <div className={styles.sound} data-sound-control>
+              <button
+                className={styles.soundToggle}
+                onClick={() => sound.toggle()}
+                aria-pressed={soundOn}
+                aria-label={soundOn ? 'Turn music off' : 'Turn music on'}
+              >
+                <SoundBars active={snd.playing && !snd.loading} demo={snd.loading} />
+                <span className={`${styles.soundLabel} mono`}>{snd.loading ? 'Loading' : soundOn ? 'Sound on' : 'Sound off'}</span>
+              </button>
+              <button className={`${styles.trackBtn} mono`} onClick={() => sound.next()} aria-label={`Next track — now playing ${track.title}`}>
+                <span className="roll">
+                  <span data-text="Next track →">♪ {track.title}</span>
+                </span>
+              </button>
+            </div>
+          )}
           <button
             className={styles.burger}
             onClick={() => setOpen((o) => !o)}
@@ -177,6 +202,35 @@ export default function Nav() {
               {profile.now.role} at {profile.now.org}
             </p>
           </div>
+          {snd.supported && (
+            <div data-menu-fade className={styles.menuSound} data-sound-control>
+              <span className="mono muted">Soundtrack</span>
+              <ul>
+                {playlist.map((t, i) => {
+                  const on = snd.playing && snd.index === i
+                  return (
+                    <li key={t.title}>
+                      <button className={styles.trackItem} aria-pressed={on} onClick={() => (on ? sound.pause() : sound.select(i))}>
+                        <span className="mono">{String(i + 1).padStart(2, '0')}</span>
+                        <span className={styles.trackTitle}>{t.title}</span>
+                        <span className="mono muted">{on ? 'Playing' : t.note}</span>
+                        <SoundBars active={on} className={styles.trackBars} />
+                      </button>
+                    </li>
+                  )
+                })}
+              </ul>
+              <div className={styles.soundRow}>
+                <button className="btn" onClick={() => sound.toggle()}>
+                  {soundOn ? 'Mute' : 'Play'}
+                </button>
+                <label className={`${styles.volume} mono muted`}>
+                  Volume
+                  <input type="range" min={0} max={1} step={0.01} value={snd.volume} onChange={(e) => sound.setVolume(Number(e.target.value))} />
+                </label>
+              </div>
+            </div>
+          )}
         </aside>
       </div>
     </>

@@ -33,6 +33,16 @@ Everything you'd want to change lives in **`src/content/`**. No component edits 
 3. Screenshots: `npm run images -- "<folder of pngs>" work/<slug>` converts them to WebP in `public/images/work/<slug>/`. Use one as `cover` and list them in `gallery`.
 4. No screenshots? Leave out `cover` and pick an `art` style: `nodes`, `ridges`, `spectro`, `matrix`, `orbits`, `bars` or `court`. A unique "FIG." artwork is generated from the slug.
 
+### Soundtrack
+
+The music is generated in the browser with the Web Audio API (`src/lib/sound/`): no audio files, no licensing. Three tracks ship by default: Lo-fi Tensors, Latent Drift and Night Shift.
+
+Each track is composed once into a seamless loop in an `OfflineAudioContext` (off the main thread, while the preloader runs), then played as a single looping buffer at 32 kHz. Nothing on the page — scrolling, WebGL, image loading — can glitch it. It muffles while the menu is open and pauses when the tab is hidden.
+
+- First-time visitors choose **Enter with sound / in silence** at the end of the preloader (browsers block audio until a click). The choice is remembered.
+- Controls: the sound toggle and next-track button in the nav, plus the track list and volume in the menu.
+- To add your own song, drop an MP3 into `public/music/` and add `{ kind: 'file', title, note, src: '/music/your-song.mp3' }` to `src/content/music.ts`. Only use music you have the rights to publish.
+
 ### Add a hackathon / achievement
 
 Add an object to `recognition.ts`. `mark` is the big text on the card (`1st`, `#11`, `Finalist`…). Set `slug` to link it to a project page.
