@@ -1,0 +1,131 @@
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: var(--ink);
+  color: var(--paper);
+  clip-path: inset(0% 0% 0% 0%);
+}
+
+.preloader::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(70% 60% at 85% 110%, rgba(124, 58, 237, 0.35), transparent 70%);
+}
+
+.inner {
+  position: relative;
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: calc(var(--gutter) + 6px) var(--gutter) var(--gutter);
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--muted);
+}
+
+.top span:nth-child(2) {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .top span:nth-child(2) {
+    display: inline;
+  }
+}
+
+.log {
+  align-self: center;
+  justify-self: end;
+  width: min(420px, 100%);
+  display: grid;
+  gap: 8px;
+  color: var(--muted-2);
+}
+
+.log li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  transition: color 0.4s;
+}
+
+.log li > span:last-child {
+  opacity: 0;
+  color: var(--lilac);
+  transition: opacity 0.3s;
+}
+
+.log li.on {
+  color: var(--paper);
+}
+
+.log li.on > span:last-child {
+  opacity: 1;
+}
+
+.dots {
+  flex: 1;
+  border-bottom: 1px dotted currentColor;
+  opacity: 0.4;
+  transform: translateY(-3px);
+}
+
+.bottom {
+  display: grid;
+  gap: 20px;
+  align-items: end;
+}
+
+@media (min-width: 900px) {
+  .bottom {
+    grid-template-columns: auto 1fr;
+    gap: 6vw;
+  }
+}
+
+.count {
+  display: flex;
+  align-items: flex-start;
+  font-size: clamp(110px, 24vw, 380px);
+  font-weight: 500;
+  line-height: 0.78;
+  letter-spacing: -0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+.count sup {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.28em;
+  letter-spacing: 0;
+  line-height: 1;
+  margin-left: 0.08em;
+  color: var(--lilac);
+}
+
+.barWrap {
+  display: grid;
+  gap: 12px;
+  padding-bottom: 0.6vw;
+  color: var(--muted);
+}
+
+.bar {
+  height: 2px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.bar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--violet-2), var(--lilac));
+  transform: scaleX(0);
+  transform-origin: left;
+}

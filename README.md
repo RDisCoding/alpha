@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Rudray Dave — Portfolio v2
 
-## Getting Started
-
-First, run the development server:
+A fully static portfolio (no backend) built with Next.js 16 (`output: 'export'`), GSAP + ScrollTrigger + SplitText, Lenis smooth scroll and a hand-written WebGL shader.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # http://localhost:3000
+npm run build      # static site → ./out (plain HTML/CSS/JS, host anywhere)
+npm run preview    # serve ./out locally
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Editing content
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Everything you'd want to change lives in **`src/content/`**. No component edits needed.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| File | What's in it |
+| --- | --- |
+| `profile.ts` | Name, email, socials, résumé link, About manifesto, bio, facts |
+| `experience.ts` | Internships / roles (Experience accordion) |
+| `projects.ts` | Every project, grouped as `research`, `side` or `client`; each gets a `/work/<slug>` case study |
+| `research.ts` | Research intro, interests, mentors and the publications list |
+| `recognition.ts` | Hackathons, competitions, achievements |
+| `background.ts` | Skills, coursework, education, leadership, hobbies |
 
-## Learn More
+### Add a project
 
-To learn more about Next.js, take a look at the following resources:
+1. Copy an object in `projects.ts` and give it a unique `slug`; its page appears at `/work/<slug>/`.
+2. Set `group`:
+   - `research` puts it in the pinned horizontal Research gallery (the main section). Add `status` (`'Ongoing'`, `'Accepted · Springer'`…) and `advisor` if relevant.
+   - `side` puts it in the filterable Side projects index (hackathons, coursework, personal builds). `filters` controls which filter chips it shows under.
+   - `client` puts it in Client work (freelance sites).
+   Order within the array is the order on the site, and figure numbers (R01, S03, C02) follow it.
+3. Screenshots: `npm run images -- "<folder of pngs>" work/<slug>` converts them to WebP in `public/images/work/<slug>/`. Use one as `cover` and list them in `gallery`.
+4. No screenshots? Leave out `cover` and pick an `art` style: `nodes`, `ridges`, `spectro`, `matrix`, `orbits`, `bars` or `court`. A unique "FIG." artwork is generated from the slug.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Add a hackathon / achievement
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Add an object to `recognition.ts`. `mark` is the big text on the card (`1st`, `#11`, `Finalist`…). Set `slug` to link it to a project page.
 
-## Deploy on Vercel
+## Structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+src/
+  app/            layout (nav, footer, preloader, cursor), home page, /work/[slug], sitemap, robots
+  content/        ← all the data
+  sections/       Hero, About, Research, Experience, SideProjects, ClientWork, Recognition, Stack, Beyond, ProjectView
+  components/     ShaderCanvas (WebGL), GenerativeCover, Spectrogram, Preloader, Cursor, Nav, Footer,
+                  Reveal (SplitText), Marquee, Magnetic, TiltCard, Counter, TransitionLink, PageTransition
+  lib/            gsap setup; Lenis / preloader / page-transition runtime
+scripts/
+  optimize-images.mjs   screenshots → WebP
+  fix-export.mjs        postbuild: fixes a Next 16 Windows-only export bug (prefetch file names); no-op on Linux
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deploying
+
+- **Vercel:** import the repo and set the root directory to this folder. The build runs `next build` and serves `out/`. `public/og.jpg` is the social share image, and Vercel Analytics turns on automatically.
+- **Anywhere else** (Netlify, GitHub Pages, Cloudflare Pages, S3): upload the `out/` folder.
+
+## Accessibility & performance notes
+
+- `prefers-reduced-motion` disables the preloader, smooth scroll, scrubbed animations and the shader loop.
+- The custom cursor only appears on fine-pointer (mouse) devices.
+- The shader renders at half resolution and pauses offscreen; the spectrogram and marquees also pause offscreen.

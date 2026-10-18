@@ -1,15 +1,11 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'cdn.sanity.io',
-        pathname: '**',
-      },
-    ],
-  },
-};
+  // Pure static site: `next build` emits plain HTML/CSS/JS into ./out
+  output: 'export',
+  trailingSlash: true,
+  images: { unoptimized: true },
+  reactStrictMode: true,
+}
 
-export default nextConfig;
+export default nextConfig

@@ -1,0 +1,29 @@
+.marquee {
+  overflow: hidden;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+.group {
+  display: flex;
+  align-items: center;
+  flex: none;
+}
+
+.item {
+  padding-inline: 0.28em;
+}
+
+.sep {
+  display: inline-block;
+  font-size: 0.42em;
+  color: var(--violet);
+  padding-inline: 0.28em;
+  transform: translateY(-0.12em);
+}

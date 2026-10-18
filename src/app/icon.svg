@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="16" fill="#08070b"/>
+  <text x="9" y="44" font-family="Helvetica, Arial, sans-serif" font-size="30" font-weight="700" letter-spacing="-2" fill="#f1edf7">R</text>
+  <text x="29" y="44" font-family="Georgia, 'Times New Roman', serif" font-size="32" font-style="italic" fill="#cdb9ff">D</text>
+  <circle cx="54" cy="12" r="4" fill="#9b5cff"/>
+</svg>
